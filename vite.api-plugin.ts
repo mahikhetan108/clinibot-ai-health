@@ -1,5 +1,21 @@
 import { Plugin } from 'vite';
+import fs from 'node:fs';
+import path from 'node:path';
 import { handleChat } from './src/lib/chatHandler';
+
+function getLatestApiKey(serverEnvKey: string | undefined): string | undefined {
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/^GEMINI_API_KEY=(.*)$/m);
+      if (match && match[1].trim()) {
+        return match[1].trim();
+      }
+    }
+  } catch {}
+  return serverEnvKey ?? process.env.GEMINI_API_KEY;
+}
 
 export function apiPlugin(): Plugin {
   return {
@@ -7,12 +23,18 @@ export function apiPlugin(): Plugin {
     configureServer(server) {
       server.middlewares.use('/api/chat', async (req, res) => {
         try {
-          const apiKey = server.config.env.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
+          const apiKey = getLatestApiKey(server.config.env.GEMINI_API_KEY);
           const method = req.method ?? 'GET';
           const headers: Record<string, string> = {};
-          req.rawHeaders.forEach((v, i) => {
-            if (i % 2 === 0) headers[v.toLowerCase()] = req.rawHeaders[i + 1];
-          });
+          if (req.rawHeaders) {
+            for (let i = 0; i < req.rawHeaders.length; i += 2) {
+              const key = req.rawHeaders[i].toLowerCase();
+              const val = req.rawHeaders[i + 1];
+              if (!['host', 'connection', 'content-length'].includes(key)) {
+                headers[key] = val;
+              }
+            }
+          }
 
           let body: string | undefined;
           if (method === 'POST' || method === 'PUT') {
@@ -21,10 +43,10 @@ export function apiPlugin(): Plugin {
             body = Buffer.concat(chunks).toString('utf-8');
           }
 
-          const request = new Request(`http://localhost${req.url}`, {
+          const request = new Request('http://localhost/api/chat', {
             method,
             headers,
-            body,
+            body: method === 'GET' || method === 'HEAD' || method === 'OPTIONS' ? undefined : body,
           });
 
           const response = await handleChat(request, apiKey);

@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Mail,
   Send,
@@ -69,13 +70,13 @@ export default function Contact() {
                 hello@clinibot.ai
               </a>
             </div>
-            <div className="p-6 rounded-2xl border border-slate-100 shadow-sm text-center hover:shadow-md transition-all">
+            <Link to="/chat" className="p-6 rounded-2xl border border-slate-100 shadow-sm text-center hover:shadow-md hover:border-teal-200 transition-all block">
               <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="w-6 h-6 text-teal-600" />
               </div>
               <h3 className="font-semibold text-slate-900 mb-1">Live Chat</h3>
-              <p className="text-sm text-slate-500">Talk to CliniBot AI anytime</p>
-            </div>
+              <p className="text-sm text-teal-600 font-medium hover:underline">Talk to CliniBot AI anytime →</p>
+            </Link>
             <div className="p-6 rounded-2xl border border-slate-100 shadow-sm text-center hover:shadow-md transition-all">
               <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-6 h-6 text-primary-600" />
