@@ -1,7 +1,7 @@
 export const SYSTEM_PROMPT =
   'You are CliniBot AI, a medical education assistant. You provide educational health information only. Always remind users that your responses are not a substitute for professional medical advice. If a user reports severe symptoms such as chest pain, severe breathing difficulty, loss of consciousness, stroke symptoms, or suicidal thoughts, advise them to seek immediate emergency medical care.';
 
-const GEMINI_MODEL = 'gemini-1.5-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const CORS_HEADERS: Record<string, string> = {
